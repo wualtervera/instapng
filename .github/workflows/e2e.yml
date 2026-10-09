@@ -1,0 +1,24 @@
+﻿name: e2e
+on: workflow_dispatch
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm i playwright@1 && npx playwright install --with-deps chromium
+      - run: |
+          python3 -m http.server 8080 &
+          sleep 2
+          cat > t.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          const b = await chromium.launch();
+          for (const post of ['DePQnsXEq7-', 'DeM_Mr9GK6g', 'DePI-TbRKO3']) {
+            const p = await b.newPage();
+            await p.goto('http://localhost:8080/?url=' + encodeURIComponent('https://www.instagram.com/p/' + post + '/'));
+            await p.waitForFunction(() => !document.querySelector('#submit').disabled && document.querySelector('#status').textContent.length > 0 && !/Buscando|Convirtiendo/.test(document.querySelector('#status').textContent), null, { timeout: 120000 }).catch(() => {});
+            const r = await p.evaluate(() => ({ status: document.querySelector('#status').textContent, res: [...document.querySelectorAll('.res')].map(e => e.textContent) }));
+            console.log('RESULT', post, JSON.stringify(r));
+          }
+          await b.close();
+          EOF
+          node t.mjs

@@ -1,13 +1,18 @@
 // InstaPNG — descarga imágenes públicas de Instagram en PNG (JS puro, sin dependencias).
 
-const PROXIES = [
-  (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+// Lectores/proxies con CORS para obtener la página embed (en orden de preferencia).
+const HTML_SOURCES = [
+  { url: (u) => `https://r.jina.ai/${u}`, headers: { 'X-Return-Format': 'html' } },
+  { url: (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}` },
+  { url: (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}` },
+  { url: (u) => `https://api.cors.lol/?url=${encodeURIComponent(u)}` },
+];
+// Fallback para imágenes (el CDN de Instagram normalmente permite CORS directo).
+const IMAGE_PROXIES = [
   (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
   (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
-  (u) => `https://api.cors.lol/?url=${encodeURIComponent(u)}`,
-  (u) => `https://thingproxy.freeboard.io/fetch/${u}`,
 ];
-const TIMEOUT_MS = 15000;
+const TIMEOUT_MS = 30000;
 
 const $ = (s) => document.querySelector(s);
 const form = $('#form');
@@ -76,9 +81,9 @@ function dedupe(urls) {
 
 async function fetchPostHtml(url) {
   let lastErr;
-  for (const proxy of PROXIES) {
+  for (const src of HTML_SOURCES) {
     try {
-      const res = await fetchWithTimeout(proxy(url));
+      const res = await fetchWithTimeout(src.url(url), { headers: src.headers || {} });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const text = await res.text();
       // Algunos proxies devuelven páginas de bloqueo o la versión sin datos: validar contenido.
@@ -90,7 +95,7 @@ async function fetchPostHtml(url) {
 }
 
 async function fetchImageBlob(url) {
-  const attempts = [url, ...PROXIES.map((p) => p(url))];
+  const attempts = [url, ...IMAGE_PROXIES.map((p) => p(url))];
   let lastErr;
   for (const u of attempts) {
     try {
