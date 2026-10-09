@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>InstaPNG · Descarga imágenes de Instagram en PNG</title>
+  <meta name="description" content="Descarga imágenes de publicaciones públicas de Instagram en PNG a la máxima resolución." />
+  <meta name="theme-color" content="#0b0b0f" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📷</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="hero">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg>
+      </div>
+      <h1>InstaPNG</h1>
+      <p class="subtitle">Pega el enlace de una publicación pública y descarga sus imágenes en <strong>PNG</strong> a máxima resolución.</p>
+    </header>
+
+    <form id="form" class="search" autocomplete="off">
+      <input id="url" type="url" inputmode="url" required
+             placeholder="https://www.instagram.com/p/XXXXXXXXXXX/"
+             aria-label="Enlace de Instagram" />
+      <button type="button" id="paste" class="btn ghost" title="Pegar desde el portapapeles">Pegar</button>
+      <button type="submit" id="submit" class="btn primary">
+        <span class="label">Obtener</span>
+        <span class="spinner" aria-hidden="true"></span>
+      </button>
+    </form>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+
+    <section id="toolbar" class="toolbar" hidden>
+      <span id="count"></span>
+      <button id="downloadAll" class="btn ghost small">Descargar todas</button>
+    </section>
+
+    <section id="results" class="grid" aria-label="Resultados"></section>
+
+    <footer class="footer">
+      <p>Funciona con publicaciones y carruseles públicos (<code>/p/</code>, <code>/reel/</code>). También acepta URLs directas de imágenes.</p>
+      <p>Respeta los derechos de autor: descarga solo contenido propio o con permiso.</p>
+    </footer>
+  </main>
+
+  <template id="card-tpl">
+    <article class="card">
+      <div class="thumb"><img alt="" loading="lazy" /></div>
+      <div class="meta">
+        <span class="res">—</span>
+        <button class="btn primary small dl">Descargar PNG</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
