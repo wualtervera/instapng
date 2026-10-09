@@ -1,0 +1,14 @@
+﻿name: proxy-check
+on: workflow_dispatch
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          T="https://www.instagram.com/p/DePQnsXEq7-/embed/captioned/"
+          E=$(python3 -c "import urllib.parse,sys;print(urllib.parse.quote(sys.argv[1],safe=''))" "$T")
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36"
+          for P in "https://corsproxy.io/?url=$E" "https://api.allorigins.win/raw?url=$E" "https://api.codetabs.com/v1/proxy?quest=$E" "https://api.cors.lol/?url=$E" "https://thingproxy.freeboard.io/fetch/$T"; do
+            curl -s -m 25 -A "$UA" -H "Origin: https://wualtervera.github.io" -D h.txt -o b.txt "$P"
+            echo "$P => $(head -1 h.txt | tr -d '\r') len=$(wc -c < b.txt) media=$(grep -c EmbeddedMediaImage b.txt) acao=$(grep -i access-control-allow-origin h.txt | tr -d '\r')"
+          done
